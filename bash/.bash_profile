@@ -7,7 +7,7 @@
 export PATH="$PATH:$HOME/.local/bin"
 export EDITOR="vis"
 export TERMINAL="alacritty"
-export BROWSER="librewolf"
+export BROWSER="firefox"
 export READER="zathura"
 
 if [ "$(tty)" = "/dev/tty1" ]; then

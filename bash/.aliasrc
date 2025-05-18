@@ -1,0 +1,5 @@
+#!/bin/sh
+
+alias p='sudo pacman'
+alias v=$EDITOR
+alias sv='sudo ${EDITOR}'

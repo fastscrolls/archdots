@@ -24,3 +24,6 @@ xclip
 xcompmgr
 xorg
 xsel
+maim
+xdotool
+alsa-utils

@@ -170,6 +170,10 @@ bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioPause exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
+bindsym --release Shift+Print exec --no-startup-id path="$HOME/Pictures/Screenshots/$(date +%s).png" && maim "$path" && xclip -selection clipboard -t image/png "$path"
+bindsym --release Print exec --no-startup-id path="$HOME/Pictures/Screenshots/$(date +%s).png" && maim -s "$path" && xclip -selection clipboard -t image/png "$path"
+bindsym --release $mod+Print exec --no-startup-id path="$HOME/Pictures/Screenshots/$(date +%s).png" && maim -i $(xdotool getactivewindow) "$path" && xclip -selection clipboard -t image/png "$path"
+
 
 gaps inner 5
 gaps outer 10

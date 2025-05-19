@@ -17,7 +17,6 @@ vis.events.subscribe(vis.events.WIN_OPEN, function(win) -- luacheck: no unused a
 	vis:command('set cursorline')
 	vis:command('set expandtab on')
 	vis:command('set number')
-	vis:command('set relativenumbers')
 	vis:command('set show-spaces off')
 	vis:command('set show-tabs on')
 	vis:command('set tabwidth 4')

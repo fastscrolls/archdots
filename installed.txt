@@ -27,3 +27,4 @@ xsel
 maim
 xdotool
 alsa-utils
+neovim

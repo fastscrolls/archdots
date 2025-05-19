@@ -1,4 +1,13 @@
-# Query my default IP address only on startup
+[weather]
+command=curl -Ss 'https://wttr.in/Univates?0&T&Q' | cut -c 16- | head -2 | xargs echo
+interval=3600
+color=#A4C2F4
+
+[arch-updates]
+command=bash ./arch-updatable
+interval=3600
+color=#AEEE71
+
 [volume-pipewire]
 command=bash ./pipewire-volume
 interval=persist

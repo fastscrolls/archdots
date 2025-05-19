@@ -4,7 +4,7 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.local/bin:$HOME/.scripts"
 export EDITOR="vis"
 export TERMINAL="alacritty"
 export BROWSER="firefox"

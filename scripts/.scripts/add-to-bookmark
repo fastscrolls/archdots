@@ -1,0 +1,3 @@
+#!/bin/sh
+
+link=$(xclip -o) && echo "$link" >> $HOME/bookmarks.txt && fyi 'Bookmark added' "$link" || fyi 'Failed to add bookmark' "$link"

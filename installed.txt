@@ -29,3 +29,9 @@ maim
 xdotool
 alsa-utils
 neovim
+dunst
+stow
+fyi
+bash-completion
+handlr-regex
+jq

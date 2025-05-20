@@ -1,2 +1,4 @@
-http://cs.gettysburg.edu/~duncjo01		# Random website with cool stuff
 http://cs.gettysburg.edu/~duncjo01
+.config/i3/config
+Music/
+https://wiki.archlinux.org/title/Main_page

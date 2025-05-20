@@ -1,0 +1,1 @@
+[{"mime":"audio/*","handlers":["mpv.desktop"]},{"mime":"image/*","handlers":["feh.desktop"]}]

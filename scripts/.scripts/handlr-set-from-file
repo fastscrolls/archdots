@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-jq -c '.[] | .handlers[] as $h | "handlr set \(.mime) \($h)"' "$1" | while read -r cmd; do eval "$cmd"; done
+jq -r '.[] | .mime as $m | .handlers[] | "handlr set \($m) \(. )"' "$1" | while read -r cmd; do $cmd; done
+

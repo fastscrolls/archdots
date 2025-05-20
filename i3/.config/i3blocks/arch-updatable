@@ -3,7 +3,7 @@
 sudo pacman -Sy > /dev/null 2>&1
 u=$(pacman -Qu | wc -l)
 
-if [[ -z "$u" ]]; then 
+if [[ "$u" = 0 ]]; then 
     echo " No updates available"
 else
     echo " ${u} updates available!"

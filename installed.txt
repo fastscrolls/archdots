@@ -18,6 +18,8 @@ network-manager-applet
 networkmanager
 tree
 ttf-dejavu
+noto-fonts-emoji
+ttf-font-awesome
 vim
 vis
 xclip

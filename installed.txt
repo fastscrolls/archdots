@@ -10,7 +10,6 @@ i3blocks
 i3lock
 i3status
 lf
-librewolf-bin
 linux
 linux-firmware
 lua-lpeg

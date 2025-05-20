@@ -15,7 +15,7 @@ set $mod Mod4
 #font pango:monospace 8:Noto Color Emoji 8: FontAwesome 8
 
 for_window [class="^.*"] border pixel 2
-                          # class                 border  backgr. text    indicator child_border
+# class                 border  backgr. text    indicator child_border
 for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
 
 
@@ -151,11 +151,8 @@ bindsym $mod+Shift+i resize shrink height 10 px or 10 ppt
 bindsym $mod+Shift+y resize grow width 10 px or 10 ppt
 # enter fullscreen mode for the focused container
 
-bindsym $mod+W exec --no-startup-id librewolf
-
 bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
 bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
-exec --no-startup-id feh --bg-fill ~/.fehbg
 exec --no-startup-id setxkbmap -option caps:escape -option grp:win_space_toggle -layout us,br
 # Pipewire-pulse
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle
@@ -174,6 +171,9 @@ bindsym --release Shift+Print exec --no-startup-id path="$HOME/Pictures/Screensh
 bindsym --release Print exec --no-startup-id path="$HOME/Pictures/Screenshots/$(date +%s).png" && maim -s "$path" && xclip -selection clipboard -t image/png "$path"
 bindsym --release $mod+Print exec --no-startup-id path="$HOME/Pictures/Screenshots/$(date +%s).png" && maim -i $(xdotool getactivewindow) "$path" && xclip -selection clipboard -t image/png "$path"
 
+bindsym XF86ScreenSaver exec --no-startup-id i3lock
+bindsym F1 floating toggle
+bindsym $mod+w exec --no-startup-id dmenu-bookmarks
 
 gaps inner 5
 gaps outer 10
@@ -196,4 +196,6 @@ bar {
         status_command i3blocks
 	position top
 }
+exec --no-startup-id feh --bg-fill ~/wallpaper.jpg
+
 

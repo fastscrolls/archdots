@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cat ~/bookmarks.txt | dmenu | $BROWSER

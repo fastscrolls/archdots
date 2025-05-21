@@ -1,5 +1,5 @@
 [window]
-opacity = 0.90
+opacity = 1
 padding.x = 15
 padding.y = 15
 
@@ -9,7 +9,7 @@ size = 12
 
 # gruvbox darker theme
 [colors.primary]
-background = "#000000"
+background = "#181818"
 foreground = "#E4E4E4"
 
 [colors.normal]

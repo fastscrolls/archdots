@@ -4,3 +4,6 @@ Music/
 https://wiki.archlinux.org/title/Main_page
 https://inv.nadeko.net/feed/popular
 http://www.juliansimon.org/writings/Ultimate_Resource/
+https://www.gutenberg.org/
+https://jinteki.industries/
+https://marginalia-search.com/

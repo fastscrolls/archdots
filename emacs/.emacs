@@ -62,11 +62,11 @@
 (setq-default font-lock-maximum-decoration t)
 (global-font-lock-mode t)
 
-(set-face-font 'default  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 16 :height 158))
+(set-face-font 'default  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
 
-(set-face-font 'fixed-pitch  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 16 :height 158))
-(set-face-font 'fixed-pitch-serif (font-spec :family "DejaVu Serif" :weight 'light :size 16 :height 158))
-(set-face-font 'variable-pitch (font-spec :family "DejaVu Sans" :weight 'light :size 16 :height 158))
+(set-face-font 'fixed-pitch  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
+(set-face-font 'fixed-pitch-serif (font-spec :family "DejaVu Serif" :weight 'light :size 22 :height 158))
+(set-face-font 'variable-pitch (font-spec :family "DejaVu Sans" :weight 'light :size 22 :height 158))
 
 (set-face-attribute 'font-lock-constant-face nil :weight 'normal)
 (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
@@ -145,22 +145,19 @@ odes."
 
 (setq-default word-wrap t)
 
-(setq-default truncate-lines nil)
+(setq-default truncate-lines t)
 
 ;; lets be explicit and re-enable everythig important
-(add-hook 'prog-mode-hook (lambda ()
-    		            (setq show-trailing-whitespace t)
-    		            (setq indicate-empty-lines t)
+(setq show-trailing-whitespace t)
+(setq indicate-empty-lines t)
 
-                    (setq tab-width 4)
-                    (setq fill-column 72)
-                    (set-fill-column 72)
-                    (auto-fill-mode t)))
 
-(setq-default tab-width 4)
-(setq-default fill-column 72)
+(setq tab-width 4)
+(setq fill-column 72)
 (set-fill-column 72)
 (auto-fill-mode t)
+(setq-default auto-fill-function 'do-auto-fill)
+
 (setopt display-fill-column-indicator-column 72)
 (setq-default display-fill-column-indicator-column 72)
 (global-highlight-changes-mode 1)
@@ -347,6 +344,9 @@ odes."
 (use-package which-key-posframe
   :straight t
   :init (which-key-posframe-mode 1))
+
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

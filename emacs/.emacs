@@ -62,11 +62,25 @@
 (setq-default font-lock-maximum-decoration t)
 (global-font-lock-mode t)
 
-(set-face-font 'default  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
 
-(set-face-font 'fixed-pitch  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
-(set-face-font 'fixed-pitch-serif (font-spec :family "DejaVu Serif" :weight 'light :size 22 :height 158))
-(set-face-font 'variable-pitch (font-spec :family "DejaVu Sans" :weight 'light :size 22 :height 158))
+(cond
+ ((eq system-type 'windows-nt)
+  (when (member "Consolas" (font-family-list))
+    (set-frame-font "Consolas" t t)))
+ ((eq system-type 'darwin) ; macOS
+  (when (member "Menlo" (font-family-list))
+    (set-face-font 'default  (font-spec :family "Menlo" :weight 'light :size 22 :height 158))
+    (set-face-font 'fixed-pitch  (font-spec :family "Menlo" :weight 'light :size 22 :height 158))
+    (set-face-font 'fixed-pitch-serif (font-spec :family "Times New Roman" :weight 'light :size 22 :height 158))
+    (set-face-font 'variable-pitch (font-spec :family "Arial" :weight 'light :size 22 :height 158))))
+ ((eq system-type 'gnu/linux)
+  (when (member "DejaVu Sans Mono" (font-family-list))
+    (set-face-font 'default  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
+    (set-face-font 'fixed-pitch  (font-spec :family "DejaVu Sans Mono" :weight 'light :size 22 :height 158))
+    (set-face-font 'fixed-pitch-serif (font-spec :family "Serif" :weight 'light :size 22 :height 158))
+    (set-face-font 'variable-pitch (font-spec :family "DejaVu Sans" :weight 'light :size 22 :height 158))
+    )))
+
 
 (set-face-attribute 'font-lock-constant-face nil :weight 'normal)
 (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
@@ -118,14 +132,22 @@ odes."
     '((t (:family "serif")))
     "A variable-pitch face with serifs."
     :group 'basic-faces)
-
+(cond
+ ((eq system-type 'gnu/linux)
 (defcustom variable-pitch-serif-font (font-spec :family "DejaVu Serif")
   "The font face used for `variable-pitch-serif'."
   :group 'basic-faces
   :set (lambda (symbol value)
 	   (set-face-attribute 'variable-pitch-serif nil :font value)
-	   (set-default-toplevel-value symbol value)))
-
+	   (set-default-toplevel-value symbol value)))))
+(cond
+ ((eq system-type 'darwin)
+(defcustom variable-pitch-serif-font (font-spec :family "Times New Roman")
+  "The font face used for `variable-pitch-serif'."
+  :group 'basic-faces
+  :set (lambda (symbol value)
+	   (set-face-attribute 'variable-pitch-serif nil :font value)
+	   (set-default-toplevel-value symbol value)))))
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-always-indent 'complete)
@@ -202,6 +224,7 @@ odes."
 (delete-old-versions -1)
 (create-lockfiles t)
 (auto-save-visited-mode t)
+(setq backup-directory-alist `(("." . "~/.saves")))
 :config
 (defun save-all ()
   (interactive)
@@ -230,9 +253,10 @@ odes."
   (scroll-bar-mode -1)
   (fringe-mode -1))
 
+(when (eq system-type 'darwin)
+  (menu-bar-mode 1))
 
 (use-package ef-themes)
-
 (load-theme 'ef-melissa-light t)
 
 ;; html
@@ -345,6 +369,9 @@ odes."
   :straight t
   :init (which-key-posframe-mode 1))
 
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . light))
+(setq ns-use-proxy-icon nil)
 
 
 (custom-set-variables

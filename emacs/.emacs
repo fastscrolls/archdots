@@ -182,7 +182,7 @@ odes."
 
 (setopt display-fill-column-indicator-column 72)
 (setq-default display-fill-column-indicator-column 72)
-(global-highlight-changes-mode 1)
+(global-highlight-changes-mode -1)
 
 (global-display-fill-column-indicator-mode 1)
 
@@ -218,9 +218,9 @@ odes."
 :custom
 (auto-save-default t)
 (make-backup-files -1)
-(backup-by-copying t)
-(version-control t)
-(vc-make-backup-files t)
+(backup-by-copying -1)
+(version-control -1)
+(vc-make-backup-files -1)
 (delete-old-versions -1)
 (create-lockfiles t)
 (auto-save-visited-mode t)
@@ -373,6 +373,164 @@ odes."
 (add-to-list 'default-frame-alist '(ns-appearance . light))
 (setq ns-use-proxy-icon nil)
 
+(defvar xah-open-file-at-cursor-pre-hook nil "Hook for `xah-open-file-at-cursor'.
+Functions in the hook is called in order, each given the raw input text (path) as arg.
+The first return non-nil, its value is given to `xah-open-file-at-cursor' as input. rest functions in hook is ignored.
+This is useful for transforming certain url into file path. e.g. change
+http://xahlee.info/emacs/index.html
+to
+C:/Users/xah/web/xahlee_info/emacs/index.html
+, so instead of opening in browser, it opens in emacs as file.")
+
+(defun xah-open-file-at-cursor ()
+  "Open the file path under cursor.
+
+• If there is selection, use it for path.
+• Path can be {relative, full path, URL}.
+• If the path starts with 「https*://」, open the URL in browser.
+• Path may have a trailing 「:‹n›」 that indicates line number, or 「:‹n›:‹m›」 with line and column number. If so, jump to that line number.
+
+If path does not have a file extension, automatically try with .el for elisp files.
+
+See also `xah-open-file-at-cursor-pre-hook'.
+
+This command is similar to `find-file-at-point' but without prompting for confirmation.
+
+URL `http://xahlee.info/emacs/emacs/emacs_open_file_path_fast.html'
+Created: 2020-10-17
+Version: 2024-05-20"
+  (interactive)
+  (let (xinput xinput2 xpath)
+    (setq xinput (if (region-active-p)
+                     (buffer-substring-no-properties (region-beginning) (region-end))
+                   (let ((xp0 (point)) xp1 xp2
+                         (xpathStops "^  \t\n\"`'‘’“”|()[]{}「」<>〔〕〈〉《》【】〖〗«»‹›❮❯❬❭〘〙·。\\"))
+                     (skip-chars-backward xpathStops)
+                     (setq xp1 (point))
+                     (goto-char xp0)
+                     (skip-chars-forward xpathStops)
+                     (setq xp2 (point))
+                     (goto-char xp0)
+                     (buffer-substring-no-properties xp1 xp2))))
+    (setq xinput2 (if (> (length xah-open-file-at-cursor-pre-hook) 0)
+                      (let ((xprehook (run-hook-with-args-until-success 'xah-open-file-at-cursor-pre-hook xinput)))
+                        (if xprehook xprehook xinput))
+                    xinput))
+
+    (setq xpath
+          (cond
+           ((string-match "^file:///[A-Za-z]:/" xinput2) (substring xinput2 8))
+           ((string-match "^file://[A-Za-z]:/" xinput2) (substring xinput2 7))
+           (t xinput2)))
+
+    (if (string-match-p "\\`https?://" xpath)
+        (browse-url xpath)
+      (let ((xpathNoQ
+             (let ((xHasQuery (string-match "\?[a-z]+=" xpath)))
+               (if xHasQuery
+                   (substring xpath 0 xHasQuery)
+                 xpath))))
+        (cond
+         ((string-match "#" xpathNoQ)
+          (let ((xfpath (substring xpathNoQ 0 (match-beginning 0)))
+                (xfractPart (substring xpathNoQ (1+ (match-beginning 0)))))
+            (if (file-exists-p xfpath)
+                (progn
+                  (find-file xfpath)
+                  (goto-char (point-min))
+                  (search-forward xfractPart))
+              (progn
+                (message "File does not exist. Created at\n%s" xfpath)
+                (find-file xfpath)))))
+         ((string-match "^\\`\\(.+?\\):\\([0-9]+\\)\\(:[0-9]+\\)?\\'" xpathNoQ)
+          (let ((xfpath (match-string-no-properties 1 xpathNoQ))
+                (xlineNum (string-to-number (match-string-no-properties 2 xpathNoQ))))
+            (if (file-exists-p xfpath)
+                (progn
+                  (find-file xfpath)
+                  (goto-char (point-min))
+                  (forward-line (1- xlineNum)))
+              (progn
+                (message "File does not exist. Created at\n%s" xfpath)
+                (find-file xfpath)))))
+         ((file-exists-p xpathNoQ)
+          (progn ; open f.ts instead of f.js
+            (let ((xext (file-name-extension xpathNoQ))
+                  (xfnamecore (file-name-sans-extension xpathNoQ)))
+              (if (and (string-equal xext "js")
+                       (file-exists-p (concat xfnamecore ".ts")))
+                  (progn
+                    (find-file (concat xfnamecore ".ts"))
+                    (warn "Typescript file .ts exist, opening it"))
+
+                (find-file xpathNoQ)))))
+         ((file-exists-p (concat xpathNoQ ".el"))
+          (find-file (concat xpathNoQ ".el")))
+         (t (progn
+              (message "File does not exist. Created at\n%s" xpathNoQ)
+              (find-file xpathNoQ))))))))
+
+
+(setq treesit-language-source-alist
+ '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+   (cmake "https://github.com/uyha/tree-sitter-cmake")
+   (css "https://github.com/tree-sitter/tree-sitter-css")
+   (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+   (go "https://github.com/tree-sitter/tree-sitter-go")
+   (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+   (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+   (html "https://github.com/tree-sitter/tree-sitter-html")
+   (javascript "https://github.com/tree-sitter/tree-sitter-javascript"
+ "master" "src")
+   
+   (json "https://github.com/tree-sitter/tree-sitter-json")
+   (make "https://github.com/alemuller/tree-sitter-make")
+   (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+   (python "https://github.com/tree-sitter/tree-sitter-python")
+   (toml "https://github.com/tree-sitter/tree-sitter-toml")
+   (tsx "https://github.com/tree-sitter/tree-sitter-typescript"
+   "master" "tsx/src")
+   
+   (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
+   "master" "typescript/src")
+   
+   (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+
+(use-package go-mode)
+
+(when (fboundp 'go-ts-mode)
+  (add-to-list 'major-mode-remap-alist '(go-mode . go-ts-mode)))
+
+
+(add-hook 'go-ts-mode-hook 'flymake-mode 8)
+(add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
+(add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+(defun my-go-mode-setup ()
+  (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+  (add-hook 'before-save-hook #'eglot-code-actions nil t))
+
+(add-hook 'go-ts-mode-hook #'my-go-mode-setup)
+
+;;corfuuuu
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.2)
+  (corfu-auto-prefix 1)
+  (corfu-preview-current nil)
+  :init
+  (corfu-popupinfo-mode)
+  (global-corfu-mode))
+
+(setq eldoc-echo-area-use-multiline-p t)
+
+(with-eval-after-load 'eglot
+  (define-key go-ts-mode-map (kbd "<f3>") #'xref-find-definitions)
+  (define-key go-ts-mode-map (kbd "M-,") #'xref-pop-marker-stack)
+  (define-key go-ts-mode-map (kbd "C-c h") #'eldoc))
+(add-to-list 'exec-path (expand-file-name "~/go/bin"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

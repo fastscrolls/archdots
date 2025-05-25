@@ -26,9 +26,20 @@ require('lazy').setup({
   {"nvim-treesitter/nvim-treesitter", build = ":TSUpdate"},
   {'hrsh7th/nvim-cmp'},
   {'xiyaowong/transparent.nvim'},
+  {"nvim-neo-tree/neo-tree.nvim", branch = "v3.x",
+	  dependencies = {
+	    "nvim-lua/plenary.nvim",
+	    "nvim-tree/nvim-web-devicons", 
+	    "MunifTanjim/nui.nvim",
+	  },
+	  lazy = false, -- neo-tree will lazily load itself
+	  opts = {
+	  },
+  },
   { 'junegunn/fzf.vim', dependencies = { 'junegunn/fzf' } }
 })
 
+local neo_tree = require
 
 local lsp_zero = require('lsp-zero')
 
@@ -63,6 +74,8 @@ require('mason-lspconfig').setup({
   },
 })
 
+
+
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
 
@@ -96,9 +109,11 @@ cmp.setup({
   },
 })
 
-
 vim.cmd.colorscheme('desert')
 vim.g.transparent_enabled = true
+vim.opt["tabstop"] = 4
+vim.opt["shiftwidth"] = 4
 
 vim.api.nvim_set_keymap('n', '<Space><Space>', ':FZF<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<Space>b', ':Buffers<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Space>e', ':Neotree<CR>', { noremap = true, silent = true })

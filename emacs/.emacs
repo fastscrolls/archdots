@@ -216,8 +216,8 @@ odes."
 
 (use-package emacs
 :custom
-(auto-save-default t)
-(make-backup-files -1)
+(auto-save-default nil)
+(make-backup-files nil)
 (backup-by-copying -1)
 (version-control -1)
 (vc-make-backup-files -1)
@@ -313,26 +313,9 @@ odes."
 
 ;; org
 
-  ;; (straight-use-package '(org	:type built-in))
-(straight-use-package 'flx)
-
-(use-package ido
-  :straight (:type built-in)
-  :config (ido-everywhere 1))
-
-(use-package flx-ido
-  :after ido
-  :config (flx-ido-mode t))
-
-(use-package ido-completing-read+
-  :after ido
-  :config (ido-ubiquitous-mode 1))
-
 (use-package vertico
-  ;; Special recipe to load extensions conveniently
   :straight '(vertico :files (:defaults "extensions/*")
                      :includes (vertico-indexed
-                                vertico-flat
                                 vertico-grid
                                 vertico-mouse
                                 vertico-quick
@@ -341,26 +324,36 @@ odes."
                                 vertico-reverse
                                 vertico-directory
                                 vertico-multiform
-                                vertico-unobtrusive
-                                ))
+                                vertico-unobtrusive))
   :bind  (:map vertico-map
-  ( "<tab>" . vertico-insert)    ; Choose selected candidate
-   ("<escape>" . minibuffer-keyboard-quit) ; Close minibuffer
-   ("?" . minibuffer-completion-help)
-   ("C-M-n" . vertico-next-group)
-   ("C-M-p" . vertico-previous-group))
+               ("<tab>" . vertico-insert)
+               ("<escape>" . minibuffer-keyboard-quit)
+               ("?" . minibuffer-completion-help)
+               ("C-M-n" . vertico-next-group)
+               ("C-M-p" . vertico-previous-group))
   :custom
-  (vertico-count 17)                    ; Number of candidates to display
+  (vertico-count 17)
   (vertico-resize t)
   (vertico-cycle nil)
-  :config
+  :init
   (vertico-mode 1))
 
-(setq completions-format 'vertical)
-(setq completion-styles '(flex basic partial-completion emacs22))
+(use-package orderless
+  :ensure t
+  :init
+  (setq completion-styles '(orderless)))
 
 
-  (use-package which-key
+(use-package marginalia
+  :init
+  (marginalia-mode 1))
+
+
+(use-package vertico
+  :config
+  (vertico-multiform-mode 1))
+
+(use-package which-key
   :straight t
   :config
   (which-key-mode t))
@@ -496,19 +489,98 @@ Version: 2024-05-20"
    
    (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
+(use-package lsp-mode
+  :straight t
+  :defer t
+  :hook (lsp-mode . lsp-enable-which-key-integration)
+  :hook (prog-mode . lsp)
+  :commands (lsp lsp-deferred)
+  :custom
+  (lsp-prefer-flymake nil)
+  (lsp-prefer-capf t)
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.9)
+  (lsp-signature-auto-activate t)
+  (lsp-enable-symbol-highlighting t))
+
+(use-package lsp-ui
+  :straight t
+  :defer t
+  :after lsp
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-enable-symbol-highlighting t)
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-doc-enable t)
+  (lsp-eldoc-enable-hover t)
+  (lsp-ui-doc-show-with-cursor t))
+
+(use-package flycheck
+  :straight t
+  :init
+  (global-flycheck-mode t)
+  :config
+  (setq flycheck-emacs-lisp-load-path 'inherit))
+
+(use-package flycheck-pos-tip
+  :straight t
+  :hook (flycheck-mode . flycheck-pos-tip-mode))
+
+(use-package flycheck-inline
+  :straight t
+  :hook (flycheck-mode . flycheck-inline-mode))
+
+  (use-package avy-flycheck
+    :straight t
+    :config
+    (avy-flycheck-setup))
+
+
+(use-package diff-hl
+  :init
+  (global-diff-hl-mode)
+  (diff-hl-margin-mode))
+
+
+(use-package magit
+  :straight t
+  :hook (magit-post-refresh  . diff-hl-magit-post-refresh)
+  :config
+  (set-default 'magit-push-always-verify nil) 
+  (set-default 'magit-revert-buffers 'silent)
+  (set-default 'magit-no-confirm '(stage-all-changes unstage-all-changes)))
+
+(use-package ghub
+  :straight t
+  :defer t
+  :after magit)
+
+(use-package forge
+  :straight t
+  :defer t
+  :after magit)
+
+(use-package git-modes
+  :straight t
+  :defer t)
 
 (use-package go-mode)
+(use-package go-ts-mode
+  :ensure t)
 
+(add-hook 'go-mode-hook #'go-ts-mode)
 (when (fboundp 'go-ts-mode)
   (add-to-list 'major-mode-remap-alist '(go-mode . go-ts-mode)))
 
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
 
-(add-hook 'go-ts-mode-hook 'flymake-mode 8)
-(add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
-(add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+
 (defun my-go-mode-setup ()
-  (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
-  (add-hook 'before-save-hook #'eglot-code-actions nil t))
+  (add-hook 'go-ts-mode-hook 'flymake-mode 8)
+  (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9))
 
 (add-hook 'go-ts-mode-hook #'my-go-mode-setup)
 
@@ -524,9 +596,16 @@ Version: 2024-05-20"
   (corfu-popupinfo-mode)
   (global-corfu-mode))
 
+(use-package denote
+  :config
+  (setq denote-file-type 'text)
+  (setq denote-directory (expand-file-name "~/Documents/notes/"))
+  (denote-rename-buffer-mode 1))
+
+
 (setq eldoc-echo-area-use-multiline-p t)
 
-(with-eval-after-load 'eglot
+(with-eval-after-load 'lsp
   (define-key go-ts-mode-map (kbd "<f3>") #'xref-find-definitions)
   (define-key go-ts-mode-map (kbd "M-,") #'xref-pop-marker-stack)
   (define-key go-ts-mode-map (kbd "C-c h") #'eldoc))
